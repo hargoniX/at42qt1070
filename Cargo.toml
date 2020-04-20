@@ -1,0 +1,17 @@
+[package]
+name = "at42qt1070"
+version = "0.1.0"
+authors = ["Henrik Böving <hargonix@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+embedded-hal = "0.2.3"
+
+[dev-dependencies]
+panic-semihosting = "0.5.3"
+cortex-m-rt = "0.6.12"
+cortex-m = "0.6.2"
+
+[dev-dependencies.stm32l4xx-hal]
+version = "0.5.0"
+features = ["stm32l4x2"]
