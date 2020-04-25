@@ -21,6 +21,18 @@ bitfield!{
     touch, _: 0;
 }
 
+bitfield!{
+    pub struct KeyStatus(u8);
+    impl Debug;
+    key6, _: 6;
+    key5, _: 5;
+    key4, _: 4;
+    key3, _: 3;
+    key2, _: 2;
+    key1, _: 1;
+    key0, _: 0;
+}
+
 pub struct Driver<I2C> {
     i2c: I2C,
 }
@@ -47,7 +59,7 @@ where
 
         loop {
             let status = self.get_status()?;
-            if !status.calibrate {
+            if !status.calibrate() {
                 break;
             }
         }
@@ -60,6 +72,13 @@ where
         self.i2c.write_read(Chip::I2C, &[Chip::STATUS_ADDR], &mut buffer)?;
         Ok(Status(buffer[0]))
     }
+
+    pub fn get_key_status(&mut self) -> Result<KeyStatus, Error<I2cError>> {
+        let mut buffer = [0u8; 1];
+        self.i2c.write_read(Chip::I2C, &[Chip::KEY_STATUS_ADDR], &mut buffer)?;
+        Ok(KeyStatus(buffer[0]))
+    }
+
     fn get_id(&mut self) -> Result<u8, Error<I2cError>> {
         let mut buffer = [0u8; 1];
         self.i2c.write_read(Chip::I2C, &[Chip::ID_ADDR], &mut buffer)?;
@@ -72,5 +91,6 @@ mod Chip {
     pub const ID: u8 = 0x2E;
     pub const ID_ADDR: u8 = 0;
     pub const STATUS_ADDR: u8 = 2;
+    pub const KEY_STATUS_ADDR: u8 = 3;
     pub const CALIBRATE_ADDR: u8 = 56;
 }
