@@ -2,6 +2,7 @@
 use bitfield::bitfield;
 use embedded_hal::blocking::i2c::{Write, WriteRead};
 
+#[derive(Clone, Copy, Debug)]
 pub enum Error<I2cError> {
     I2cError(I2cError),
     IdMismatch(u8),
@@ -16,21 +17,21 @@ impl<E> From<E> for Error<E> {
 bitfield! {
     pub struct Status(u8);
     impl Debug;
-    calibrate, _: 7;
-    overflow, _: 6;
-    touch, _: 0;
+    pub calibrate, _: 7;
+    pub overflow, _: 6;
+    pub touch, _: 0;
 }
 
 bitfield! {
     pub struct KeyStatus(u8);
     impl Debug;
-    key6, _: 6;
-    key5, _: 5;
-    key4, _: 4;
-    key3, _: 3;
-    key2, _: 2;
-    key1, _: 1;
-    key0, _: 0;
+    pub key6, _: 6;
+    pub key5, _: 5;
+    pub key4, _: 4;
+    pub key3, _: 3;
+    pub key2, _: 2;
+    pub key1, _: 1;
+    pub key0, _: 0;
 }
 
 pub struct Driver<I2C> {

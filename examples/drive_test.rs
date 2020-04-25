@@ -7,6 +7,7 @@ use cortex_m_rt::entry;
 
 use stm32l4xx_hal::i2c::I2c;
 use stm32l4xx_hal::prelude::*;
+use at42qt1070::Driver;
 
 #[entry]
 fn main() -> ! {
@@ -28,9 +29,25 @@ fn main() -> ! {
         .into_open_drain_output(&mut gpiob.moder, &mut gpiob.otyper);
     let sda = sda.into_af4(&mut gpiob.moder, &mut gpiob.afrh);
 
-    let mut i2c = I2c::i2c2(dp.I2C2, (scl, sda), 400.khz(), clocks, &mut rcc.apb1r1);
-    let mut buffer = [0u8; 1];
-    i2c.write_read(0x1B << 1, &[0x00], &mut buffer).unwrap();
+    let i2c = I2c::i2c2(dp.I2C2, (scl, sda), 400.khz(), clocks, &mut rcc.apb1r1);
+    let mut driver = Driver::new(i2c).unwrap();
+    driver.calibrate().unwrap();
+
+    loop {
+        let status = driver.get_status().unwrap();
+        if status.touch() {
+            break;
+        }
+    }
+
+    let key_status = driver.get_key_status().unwrap();
+    let key0 = key_status.key0();
+    let key1 = key_status.key1();
+    let key2 = key_status.key2();
+    let key3 = key_status.key3();
+    let key4 = key_status.key4();
+    let key5 = key_status.key5();
+    let key6 = key_status.key6();
 
     loop {}
 }
