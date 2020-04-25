@@ -1,10 +1,10 @@
 #![no_std]
-use embedded_hal::blocking::i2c::{Write, WriteRead};
 use bitfield::bitfield;
+use embedded_hal::blocking::i2c::{Write, WriteRead};
 
 pub enum Error<I2cError> {
     I2cError(I2cError),
-    IdMismatch(u8)
+    IdMismatch(u8),
 }
 
 impl<E> From<E> for Error<E> {
@@ -13,7 +13,7 @@ impl<E> From<E> for Error<E> {
     }
 }
 
-bitfield!{
+bitfield! {
     pub struct Status(u8);
     impl Debug;
     calibrate, _: 7;
@@ -21,7 +21,7 @@ bitfield!{
     touch, _: 0;
 }
 
-bitfield!{
+bitfield! {
     pub struct KeyStatus(u8);
     impl Debug;
     key6, _: 6;
@@ -42,9 +42,7 @@ where
     I2C: WriteRead<Error = I2cError> + Write<Error = I2cError>,
 {
     pub fn new(i2c: I2C) -> Result<Driver<I2C>, Error<I2cError>> {
-        let mut driver = Driver {
-            i2c: i2c,
-        };
+        let mut driver = Driver { i2c: i2c };
 
         let id = driver.get_id()?;
         if id != Chip::ID {
@@ -69,19 +67,22 @@ where
 
     pub fn get_status(&mut self) -> Result<Status, Error<I2cError>> {
         let mut buffer = [0u8; 1];
-        self.i2c.write_read(Chip::I2C, &[Chip::STATUS_ADDR], &mut buffer)?;
+        self.i2c
+            .write_read(Chip::I2C, &[Chip::STATUS_ADDR], &mut buffer)?;
         Ok(Status(buffer[0]))
     }
 
     pub fn get_key_status(&mut self) -> Result<KeyStatus, Error<I2cError>> {
         let mut buffer = [0u8; 1];
-        self.i2c.write_read(Chip::I2C, &[Chip::KEY_STATUS_ADDR], &mut buffer)?;
+        self.i2c
+            .write_read(Chip::I2C, &[Chip::KEY_STATUS_ADDR], &mut buffer)?;
         Ok(KeyStatus(buffer[0]))
     }
 
     fn get_id(&mut self) -> Result<u8, Error<I2cError>> {
         let mut buffer = [0u8; 1];
-        self.i2c.write_read(Chip::I2C, &[Chip::ID_ADDR], &mut buffer)?;
+        self.i2c
+            .write_read(Chip::I2C, &[Chip::ID_ADDR], &mut buffer)?;
         Ok(buffer[0])
     }
 }
