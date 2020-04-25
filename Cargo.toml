@@ -6,6 +6,7 @@ edition = "2018"
 
 [dependencies]
 embedded-hal = "0.2.3"
+bitfield = "0.13.2"
 
 [dev-dependencies]
 panic-semihosting = "0.5.3"
