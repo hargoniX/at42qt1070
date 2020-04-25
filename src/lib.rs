@@ -46,7 +46,7 @@ where
         let mut driver = Driver { i2c: i2c };
 
         let id = driver.get_id()?;
-        if id != Chip::ID {
+        if id != chip::ID {
             return Err(Error::IdMismatch(id));
         }
 
@@ -54,7 +54,7 @@ where
     }
 
     pub fn calibrate(&mut self) -> Result<(), Error<I2cError>> {
-        self.i2c.write(Chip::I2C, &[Chip::CALIBRATE_ADDR, 0xFF])?;
+        self.i2c.write(chip::I2C, &[chip::CALIBRATE_ADDR, 0xFF])?;
 
         loop {
             let status = self.get_status()?;
@@ -69,26 +69,26 @@ where
     pub fn get_status(&mut self) -> Result<Status, Error<I2cError>> {
         let mut buffer = [0u8; 1];
         self.i2c
-            .write_read(Chip::I2C, &[Chip::STATUS_ADDR], &mut buffer)?;
+            .write_read(chip::I2C, &[chip::STATUS_ADDR], &mut buffer)?;
         Ok(Status(buffer[0]))
     }
 
     pub fn get_key_status(&mut self) -> Result<KeyStatus, Error<I2cError>> {
         let mut buffer = [0u8; 1];
         self.i2c
-            .write_read(Chip::I2C, &[Chip::KEY_STATUS_ADDR], &mut buffer)?;
+            .write_read(chip::I2C, &[chip::KEY_STATUS_ADDR], &mut buffer)?;
         Ok(KeyStatus(buffer[0]))
     }
 
     fn get_id(&mut self) -> Result<u8, Error<I2cError>> {
         let mut buffer = [0u8; 1];
         self.i2c
-            .write_read(Chip::I2C, &[Chip::ID_ADDR], &mut buffer)?;
+            .write_read(chip::I2C, &[chip::ID_ADDR], &mut buffer)?;
         Ok(buffer[0])
     }
 }
 
-mod Chip {
+mod chip {
     pub const I2C: u8 = 0x1B << 1;
     pub const ID: u8 = 0x2E;
     pub const ID_ADDR: u8 = 0;
